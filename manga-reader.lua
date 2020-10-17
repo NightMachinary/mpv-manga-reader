@@ -7,8 +7,8 @@ local initiated = false
 local input = ""
 local jump = false
 local opts = {
-	auto_start = false,
-	continuous = true,
+	auto_start = true,
+	continuous = false,
 	continuous_size = 8,
 	double = false,
 	manga = false,
@@ -488,8 +488,8 @@ function set_keys()
 		mp.add_forced_key_binding("Ctrl+RIGHT", "skip-forward", skip_forward)
 		mp.add_forced_key_binding("Ctrl+LEFT", "skip-backward", skip_backward)
 	end
-	mp.add_forced_key_binding("UP", "pan-up", pan_up)
-	mp.add_forced_key_binding("DOWN", "pan-down", pan_down)
+	mp.add_forced_key_binding("UP", "pan-up", pan_up, "repeatable")
+	mp.add_forced_key_binding("DOWN", "pan-down", pan_down, "repeatable")
 	mp.add_forced_key_binding("HOME", "first-page", first_page)
 	mp.add_forced_key_binding("END", "last-page", last_page)
 	mp.add_forced_key_binding("/", "jump-page-mode", jump_page_mode)
