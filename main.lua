@@ -1,0 +1,1 @@
+require  "manga-reader"
