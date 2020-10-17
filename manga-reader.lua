@@ -14,7 +14,7 @@ local opts = {
 	manga = false,
 	monitor_height = 1080,
 	monitor_width = 1920,
-	pan_size = 0.05,
+	pan_size = 0.002, -- @todo have a different pan_size for continuous mode, as that mode needs much lower values
 	skip_size = 10,
 	trigger_zone = 0.05,
 }
@@ -239,7 +239,7 @@ function set_lavfi_complex_continuous(arg, alignment, pages)
 	mp.set_property("lavfi-complex", vstack)
 	local index = mp.get_property_number("playlist-pos")
 	local zoom_level = calculate_zoom_level(filedims[index], pages)
-	mp.set_property("video-zoom", log2(zoom_level))
+	mp.set_property("video-zoom", 1.32*log2(zoom_level)) -- @hiddendep zoom level
 	mp.set_property("video-pan-y", 0)
 	if alignment == "top" then
 		mp.set_property("video-align-y", -1)
@@ -488,7 +488,13 @@ function set_keys()
 		mp.add_forced_key_binding("Ctrl+RIGHT", "skip-forward", skip_forward)
 		mp.add_forced_key_binding("Ctrl+LEFT", "skip-backward", skip_backward)
 	end
+
+	-- @todo mouth hotkeys not disabled in toggle
+	mp.add_forced_key_binding("MBTN_LEFT", "MBTN_LEFT_next-page", next_page)
+	mp.add_forced_key_binding("MBTN_RIGHT", "MBTN_RIGHT_prev-page", prev_page)
+	mp.add_forced_key_binding("WHEEL_UP", "WHEEL_UP_pan-up", function() mp.commandv("add", "video-pan-y", 0.01 or opts.pan_size) end)
 	mp.add_forced_key_binding("UP", "pan-up", pan_up, "repeatable")
+	mp.add_forced_key_binding("WHEEL_DOWN", "WHEEL_DOWN_pan-down", pan_down)
 	mp.add_forced_key_binding("DOWN", "pan-down", pan_down, "repeatable")
 	mp.add_forced_key_binding("HOME", "first-page", first_page)
 	mp.add_forced_key_binding("END", "last-page", last_page)
@@ -651,12 +657,13 @@ function check_y_pos()
 end
 
 function toggle_continuous_mode()
+	-- local zoom = mp.get_property("video-zoom", 1)
 	if opts.continuous then
 		mp.osd_message("Continuous Mode Off")
 		opts.continuous = false
 		mp.unobserve_property(check_y_pos)
-		mp.set_property("video-zoom", 0)
-		mp.set_property("video-align-y", 0)
+		mp.set_property("video-zoom", 1.0) -- @hiddendep on mpv-manga
+		mp.set_property("video-align-y", -1) -- @hiddendep
 		mp.set_property("video-pan-y", 0)
 	else
 		mp.osd_message("Continuous Mode On")
@@ -665,6 +672,7 @@ function toggle_continuous_mode()
 		mp.observe_property("video-pan-y", number, check_y_pos)
 	end
 	change_page(0)
+	mp.set_property("video-pan-y", 0) -- @me
 end
 
 function toggle_double_page()
