@@ -672,7 +672,7 @@ function toggle_continuous_mode()
 		mp.observe_property("video-pan-y", number, check_y_pos)
 	end
 	change_page(0)
-	mp.set_property("video-pan-y", 0) -- @me
+	mp.set_property("video-pan-y", 0) -- @me, seems useless
 end
 
 function toggle_double_page()
